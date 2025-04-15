@@ -3,23 +3,29 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Register</title>
+    <link rel="stylesheet" href="/css/register.css">
 </head>
 <body>
-<h2>Register</h2>
-<form th:action="@{/register}" method="post">
-    <label>Username:</label><br/>
-    <input type="text" name="username" required><br/>
+<div class="register-container">
+    <h2>Register</h2>
+    <form th:action="@{/register}" method="post">
+        <label>Username:</label>
+        <input type="text" name="username" required>
 
-    <label>Email:</label><br/>
-    <input type="email" name="email" required><br/>
+        <label>Email:</label>
+        <input type="email" name="email" required>
 
-    <label>Password:</label><br/>
-    <input type="password" name="password" required><br/>
+        <label>Password:</label>
+        <input type="password" name="password" required>
 
-    <!-- <label>Register as Admin:</label>
-    <input type="checkbox" name="admin"><br/> -->
+        <!-- <label>Register as Admin:</label>
+        <input type="checkbox" name="admin"><br/> -->
 
-    <button type="submit">Register</button>
-</form>
+        <button type="submit" class="btn-custom">Register</button>
+    </form>
+    <div class="login-link">
+        Already have an account? <a href="/login">Login here</a>
+    </div>
+</div>
 </body>
 </html>
