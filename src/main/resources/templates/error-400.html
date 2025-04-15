@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bad Request - CupidReads</title>
+    <style>
+        body {
+            background: url('/images/bookbg.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Garamond', serif;
+            color: #3d2b1f;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .error-container {
+            background: rgba(220, 163, 39, 0.929);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0px 0px 20px rgba(90, 62, 54, 0.5);
+        }
+
+        h1 {
+            color: #631702;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #631702;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background: #3d2b1f;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>400 - Bad Request</h1>
+        <p>There was a problem with your request. Please try again.</p>
+        <a href="/clubs" class="btn">Back to Clubs</a>
+    </div>
+</body>
+</html> 

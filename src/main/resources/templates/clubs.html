@@ -170,11 +170,9 @@
             <p class="club-title" th:text="${club.name}">Fantasy Lovers</p>
             <p class="club-desc" th:text="${club.description}">A club for fans of fantasy novels.</p>
             <p class="club-type" th:text="'Type: ' + ${club.clubType}">Type: Public</p>
-            <form th:action="@{/clubs/join}" method="post">
-                <input type="hidden" name="name" th:value="${club.name}">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <button type="submit" class="btn">Join Club</button>
-            </form>
+            <!-- Debug info -->
+            <div style="display: none;" th:text="${club.name}"></div>
+            <a th:href="@{/club/{name}/chats(name=${club.name})}" class="btn">View Club</a>
         </div>
 
         <h2>Discover Book Clubs</h2>
