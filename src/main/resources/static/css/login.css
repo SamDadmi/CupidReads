@@ -1,0 +1,31 @@
+body {
+    background: url('http://localhost:8000/images/cupidReads_webiste_login_bg.png') no-repeat center center fixed;
+    background-size: cover !important;
+    background-color: transparent !important;
+}
+.login-container {
+    width: 100%;
+    max-width: 350px; /* Reduce size */
+    margin: 250px auto; /* Move lower */
+    padding: 20px; /* Reduce padding */
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.login-container h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+.btn-custom {
+    width: 100%;
+    background-color: #d82a2a;
+    border: none;
+}
+.btn-custom:hover {
+    background-color: rgba(216, 42, 42, 0.73);
+}
+.signup-link {
+    text-align: center;
+    margin-top: 15px;
+}

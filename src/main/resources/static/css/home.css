@@ -1,0 +1,188 @@
+/* --- General Styling --- */
+body {
+    background: url('/images/background.png') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Garamond', serif;
+    color: #120303;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Welcome Box --- */
+.welcome-box {
+    text-align: center;
+    background: rgba(180, 13, 4, 0.9);
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 15px;
+    margin: 0;
+}
+
+/* --- Navigation Bar --- */
+nav {
+    background: linear-gradient(to right, #b40d04, #ea3a1b);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav a {
+    color: #f5f1e9;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: 0.3s ease;
+}
+
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+
+nav button.logout {
+    background: #da2222;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none; /* Remove border for consistency*/ 
+    color: #ffffff; /* Text color */
+    font-family: 'Times New Roman', Times, serif; /* Apply Times New Roman font */
+    font-weight: bolder;
+    font-size: 18px;
+
+
+}
+
+nav button.logout:hover {
+    background: #b40808;
+}
+
+/*nav button.logout {
+    color: #f5f1e9; /* Text color 
+    font-weight: bold; /* Bold text 
+    background: #da2222; /* Red background for logout 
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none; /* Remove border for consistency 
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+nav button.logout:hover {
+    background: #b40808; /* Darker red on hover 
+}*/
+
+/* --- Slideshow --- */
+.slideshow-container {
+    max-width: 900px;
+    margin: 30px auto;
+    position: relative;
+    background: linear-gradient(to right, rgb(239, 230, 133), rgb(193, 205, 29));
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.book-slide {
+    display: none;
+    padding: 20px;
+    text-align: center;
+}
+
+.book-slide h2 {
+    color: #4b3f2f;
+}
+
+.book-slide img {
+    width: 200px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.prev { left: 0; }
+.next { right: 0; }
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* --- Quote Section --- */
+.quote-section {
+    text-align: center;
+    margin-top: 20px;
+    font-style: italic;
+    font-size: 18px;
+    background: #fffbe6;
+    padding: 15px;
+    border-left: 5px solid #4b3f2f;
+}
+
+/* --- Search Bar --- */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: #e0d6c5;
+    border-bottom: 3px solid #c70000;
+}
+
+.search-bar input,
+.search-bar select,
+.search-bar button {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #4b3f2f;
+    border-radius: 5px;
+}
+
+.search-bar button {
+    background: #4b3f2f;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.search-bar button:hover {
+    background: #2e251b;
+}
+
+/* --- Container Styling --- */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Book Recommendation --- */
+.book-recommendation {
+    padding: 20px;
+    background: #fffbe6;
+    border-left: 5px solid #4b3f2f;
+    font-style: italic;
+}
+
+/* --- Notifications --- */
+.notification {
+    padding: 20px;
+    background: #f8d7da;
+    border-left: 5px solid #f07272;
+}

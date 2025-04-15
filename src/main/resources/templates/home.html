@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home Page</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body>
+
+<!-- Welcome Display Box -->
+<div class="welcome-box">
+    <h1>Welcome to CupidReads</h1>
+</div>
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<nav>
+    <a href="/swipe-books">Swipe Books</a>
+    <a href="/my-books">My Books</a>
+    <a href="/clubs">Clubs</a>
+    <a href="/profile">Profile</a>
+    <!-- <a href="/logout" style="float: right;">Logout</a> -->
+    <form th:action="@{/logout}" method="post" style="display: inline;">
+        <button type="submit" class="logout">Logout</button>
+    </form>
+    
+     
+</nav>
+
+<div class="slideshow-container">
+    <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+
+    <div th:each="book, iterStat : ${books}" 
+         class="book-slide" 
+         th:style="'display:' + (${iterStat.index} == 0 ? 'block' : 'none')">
+        <h2 th:text="${book.title}">Book Title</h2>
+        <img th:src="@{${book.image}}" th:alt="${book.title}" />
+    </div>
+
+    <button class="next" onclick="changeSlide(1)">&#10095;</button>
+</div>
+
+
+
+<!-- Quote Section -->
+<div class="quote-section" id="book-quote">
+    "A reader lives a thousand lives before he dies. The man who never reads lives only one." – George R.R. Martin
+</div>
+
+<script>
+    let slideIndex = 0;
+    const slides = document.querySelectorAll(".book-slide");
+    const quotes = [
+        "A room without books is like a body without a soul. – Cicero",
+        "So many books, so little time. – Frank Zappa",
+        "You can never get a cup of tea large enough or a book long enough to suit me. – C.S. Lewis",
+        "There is no friend as loyal as a book. – Ernest Hemingway",
+        "The only thing that you absolutely have to know is the location of the library. – Albert Einstein",
+        "A reader lives a thousand lives before he dies. – George R.R. Martin",
+        "I have always imagined that Paradise will be a kind of library. – Jorge Luis Borges",
+        "Reading is essential for those who seek to rise above the ordinary. – Jim Rohn",
+        "That’s the thing about books. They let you travel without moving your feet. – Jhumpa Lahiri",
+        "Books are a uniquely portable magic. – Stephen King"
+    ];
+
+    function showSlide(index) {
+        slides.forEach(slide => slide.style.display = "none");
+        slides[index].style.display = "block";
+        document.getElementById("book-quote").innerText = quotes[index];
+    }
+
+    function changeSlide(n) {
+        slideIndex = (slideIndex + n + slides.length) % slides.length;
+        showSlide(slideIndex);
+    }
+
+    showSlide(slideIndex);
+    setInterval(() => changeSlide(1), 5000);
+</script>
+
+<div class="search-bar">
+    <input type="text" placeholder="Search books..." />
+    <select>
+        <option value="">Filter by Genre</option>
+        <option value="fiction">Fiction</option>
+        <option value="non-fiction">Non-Fiction</option>
+        <option value="fantasy">Fantasy</option>
+    </select>
+    <select>
+        <option value="ratings">Sort by Ratings</option>
+        <option value="popularity">Sort by Popularity</option>
+    </select>
+    <button>Search</button>
+</div>
+
+<div class="container">
+    <div class="book-recommendation">
+        <h2>Book Recommendation of the Week</h2>
+        <p th:text="${recommendedBook}">[Book Name]</p>
+    </div>
+
+    <div class="notification">
+        <h2>Notifications</h2>
+        <p th:text="${notifications}">You have no new notifications.</p>
+    </div>
+</div>
+
+</body>
+</html>

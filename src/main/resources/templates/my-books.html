@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Books - CupidReads</title>
+    <link rel="stylesheet" th:href="@{/css/my-books.css}">
+
+</head>
+<body>
+
+<div class="welcome-box">
+    <h1>My Books</h1>
+</div>
+
+<!-- navbar.html -->
+<nav th:fragment="navbar">
+    <a href="/">Home</a>
+    <a href="/swipe-books">Swipe Books</a>
+    <a href="/my-books">My Books</a>
+    <a href="/clubs">Clubs</a>
+    <a href="/profile">Profile</a>
+    <!-- <a href="/logout" class="logout">Logout</a> -->
+</nav>
+
+
+<div class="container">
+    <h2>Your Book Collection</h2>
+
+    <div class="filters">
+        <input type="text" id="searchBox" placeholder="Search by title or author">
+        <select id="filterStatus">
+            <option value="">All Status</option>
+            <option value="Completed">Completed</option>
+            <option value="Currently Reading">Currently Reading</option>
+            <option value="Wishlist">Wishlist</option>
+        </select>
+    </div>
+
+    <!-- Book Template -->
+    <div class="book-card" data-title="The Great Gatsby" data-author="F. Scott Fitzgerald" data-status="Completed">
+        <div class="book-header">
+            <img src="/images/gatsby.jpg" alt="The Great Gatsby">
+            <div class="book-info">
+                <h3>The Great Gatsby</h3>
+                <p>by F. Scott Fitzgerald</p>
+                <p class="status">Status: Completed</p>
+                <div class="progress-bar"><div class="progress" style="width: 100%;">100%</div></div>
+                <div class="rating" data-stars="4">★★★★☆</div>
+
+                <div class="book-details">
+                    <p class="synopsis"><strong>Synopsis:</strong> A classic novel that explores themes of wealth, love, and the American Dream.</p>
+                    <p class="reviews"><strong>Reviews:</strong> "A timeless masterpiece" – NY Times</p>
+                    <p class="discussions"><strong>Discussions:</strong> Explores symbolism in 1920s America and character-driven narratives.</p>
+                </div>
+
+                <button class="toggle-notes">Add/View Notes</button>
+                <div class="notes"><textarea rows="3">A masterpiece of symbolism.</textarea></div>
+            </div>
+        </div>
+    </div>
+    <div class="book-card" data-title="To Kill a Mockingbird" data-author="Harper Lee" data-status="Wishlist">
+        <div class="book-header">
+            <img src="/images/mockingbird.png" alt="To Kill a Mockingbird">
+            <div class="book-info">
+                <h3>To Kill a Mockingbird</h3>
+                <p>by Harper Lee</p>
+                <p class="status">Status: Wishlist</p>
+                <div class="progress-bar"><div class="progress" style="width: 0%;">0%</div></div>
+                <div class="rating" data-stars="0">☆☆☆☆☆</div>
+
+                <div class="book-details">
+                    <p class="synopsis"><strong>Synopsis:</strong> Set in the racially charged American South, this novel follows young Scout Finch as her father defends a black man unjustly accused of a crime.</p>
+                    <p class="reviews"><strong>Reviews:</strong> "A powerful reflection on justice and morality" – Chicago Tribune</p>
+                    <p class="discussions"><strong>Discussions:</strong> Topics include racial injustice, moral growth, and the loss of innocence.</p>
+                </div>
+                
+                <button class="toggle-notes">Add/View Notes</button>
+                <div class="notes"><textarea rows="3"></textarea></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Filter and Search
+    const searchBox = document.getElementById('searchBox');
+    const filterStatus = document.getElementById('filterStatus');
+    const cards = document.querySelectorAll('.book-card');
+
+    function filterBooks() {
+        const searchText = searchBox.value.toLowerCase();
+        const status = filterStatus.value;
+
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title').toLowerCase();
+            const author = card.getAttribute('data-author').toLowerCase();
+            const cardStatus = card.getAttribute('data-status');
+
+            const matchesSearch = title.includes(searchText) || author.includes(searchText);
+            const matchesStatus = !status || status === cardStatus;
+
+            card.style.display = (matchesSearch && matchesStatus) ? 'block' : 'none';
+        });
+    }
+
+    searchBox.addEventListener('input', filterBooks);
+    filterStatus.addEventListener('change', filterBooks);
+
+    // Toggle Notes
+    document.querySelectorAll('.toggle-notes').forEach(button => {
+        button.addEventListener('click', () => {
+            const notes = button.nextElementSibling.querySelector('textarea');
+            notes.style.display = notes.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+
+    // Optional: Dynamic Star Rating (for future if needed)
+    document.querySelectorAll('.rating').forEach(rating => {
+        rating.addEventListener('click', () => {
+            let stars = parseInt(prompt("Rate this book (0-5):"), 10);
+            stars = Math.max(0, Math.min(5, stars));
+            rating.textContent = "★★★★★☆☆☆☆☆".slice(5 - stars, 10 - stars);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add a Book</title>
+</head>
+<body>
+    <h1>Add a Book</h1>
+
+    <form th:action="@{/book-submit}" th:object="${book}" method="post">
+        <label>Book ID:</label>
+        <input type="text" th:field="*{book_id}" required /><br/>
+
+        <label>Title:</label>
+        <input type="text" th:field="*{title}" required /><br/>
+
+        <label>Author:</label>
+        <input type="text" th:field="*{author}" required /><br/>
+
+        <label>Genre:</label>
+        <input type="text" th:field="*{genre}" /><br/>
+
+        <label>Image URL:</label>
+        <input type="text" th:field="*{image}" /><br/>
+
+        <label>Synopsis:</label>
+        <textarea th:field="*{synopsis}"></textarea><br/>
+
+        <button type="submit">Submit</button>
+    </form>
+    <br><br>
+    
+
+    <p th:if="${message}" th:text="${message}"></p>
+
+    <a th:href="@{/swipe-books}">
+        <button type="button">Go to Wishlist</button>
+    </a>
+    
+    
+</body>
+</html>

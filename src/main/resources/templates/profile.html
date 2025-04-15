@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Profile - CupidReads</title>
+    <style>
+        /* Global Styling */
+        body {
+            background: url('/images/vintage-paper.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Garamond', serif;
+            color: #2c1d27;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background: linear-gradient(to right, #a40606, #d98324);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        nav a {
+            color: #f5f1e9;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 15px;
+            transition: 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        /* Profile Container */
+        .profile-container {
+            max-width: 850px;
+            margin: 60px auto;
+            background: rgba(255, 248, 220, 0.92);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(164, 6, 6, 0.4);
+            text-align: center;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+
+        /* Profile Picture */
+        .profile-img {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 5px solid #d98324;
+            object-fit: cover;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .profile-img:hover {
+            transform: scale(1.1);
+        }
+
+        /* User Info */
+        .user-name {
+            font-size: 30px;
+            font-weight: bold;
+            color: #7a1212;
+            margin-top: 15px;
+        }
+
+        .bio {
+            font-style: italic;
+            font-size: 18px;
+            margin-top: 10px;
+            color: #5a4e4e;
+        }
+
+        /* Favorite Genres & Languages */
+        .favorites {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #d98324;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 18px;
+            background: #a40606;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.3s ease;
+            font-family: 'Garamond', serif;
+        }
+
+        .btn:hover {
+            background: #7a1212;
+        }
+
+        /* Hidden Form */
+        .hidden {
+            display: none;
+        }
+
+        /* Edit Profile Section */
+        .edit-container {
+            background: url('/images/parchment-texture.jpg') no-repeat center center;
+            background-size: cover;
+            border: 3px solid #7a1212;
+            padding: 30px;
+            margin-top: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(122, 18, 18, 0.4);
+            text-align: left;
+            font-size: 18px;
+            font-family: 'Georgia', serif;
+        }
+
+        .edit-container h2 {
+            text-align: center;
+            font-size: 26px;
+            color: #7a1212;
+            font-weight: bold;
+        }
+
+        .edit-container label {
+            font-weight: bold;
+            font-size: 18px;
+            display: block;
+            margin-top: 15px;
+            color: #5a3e36;
+        }
+
+        .edit-container input,
+        .edit-container textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #7a1212;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Garamond', serif;
+            background: rgba(255, 248, 220, 0.7);
+            color: #2c1d27;
+            outline: none;
+        }
+
+        .edit-container textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        .edit-container input[type="file"] {
+            border: none;
+            background: none;
+        }
+
+        /* Fade In Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <script>
+        function toggleEdit() {
+            document.getElementById("view-profile").classList.toggle("hidden");
+            document.getElementById("edit-profile").classList.toggle("hidden");
+        }
+    </script>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav>
+    <a href="/home">Home</a>
+    <a href="/swipe-books">Swipe Books</a>
+    <a href="/my-books">My Books</a>
+    <a href="/clubs">Clubs</a>
+    <a href="/profile">Profile</a>
+    <a href="/logout" style="float: right;">Logout</a>
+</nav>
+
+<!-- Profile View Section -->
+<div class="profile-container" id="view-profile">
+    <img th:src="${profilePicture}" alt="Profile Picture" class="profile-img">
+    <h1 class="user-name" th:text="${userName}"></h1>
+    <p class="bio" th:text="${userBio}"></p>
+    <p class="favorites">
+        <strong>📖 Favorite Genres:</strong> <span th:text="${favoriteGenres}"></span><br>
+        <strong>🌍 Favorite Languages:</strong> <span th:text="${favoriteLanguages}"></span>
+    </p>
+
+    <!-- Buttons -->
+    <button class="btn" onclick="toggleEdit()">✏️ Edit Profile</button>
+    <a href="/home" class="btn">← Back to Home</a>
+</div>
+
+<!-- Edit Profile Section -->
+<div class="profile-container hidden" id="edit-profile">
+    <div class="edit-container">
+        <h2>✎ Edit Your Profile</h2>
+        <form action="/profile/update" method="post" enctype="multipart/form-data">
+            <label>Name:</label>
+            <input type="text" name="name" th:value="${userName}" required>
+
+            <label>Bio:</label>
+            <textarea name="bio" th:text="${userBio}"></textarea>
+
+            <label>Favorite Genres:</label>
+            <input type="text" name="favoriteGenres" th:value="${favoriteGenres}">
+
+            <label>Favorite Languages:</label>
+            <input type="text" name="favoriteLanguages" th:value="${favoriteLanguages}">
+
+            <label>Profile Picture:</label>
+            <input type="file" name="profilePicture" accept="image/*">
+
+            <button type="submit" class="btn">Save Changes</button>
+            <button type="button" class="btn" onclick="toggleEdit()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html> 

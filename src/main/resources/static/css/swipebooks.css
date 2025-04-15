@@ -1,0 +1,170 @@
+body {
+    background: url('/images/bgb.png') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Garamond', serif;
+    color: #120303;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: linear-gradient(to right, #b40d04, #ea3a1b);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 99;
+}
+
+nav a {
+    color: #f5f1e9;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 15px;
+}
+
+nav a.logout {
+    background: #da2222;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+#app {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-top: 80px;
+    transition: margin-right 0.3s ease;
+}
+
+#wishlist {
+    background: rgba(255, 255, 255, 0.95);
+    border-left: 3px solid #b40d04;
+    padding: 30px 20px;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+    transform: translateX(100%);
+    position: fixed;
+    right: 0;
+    top: 60px;
+    bottom: 0;
+    width: 300px;
+    z-index: 100;
+}
+
+#wishlist.show {
+    transform: translateX(0);
+}
+
+#wishlist h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    color: #b40d04;
+}
+
+#wishlist li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0e6be;
+    font-size: 16px;
+}
+
+.card {
+    position: absolute;
+    width: 360px;
+    height: 550px;
+    background: #fffef2;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    touch-action: pan-y;
+}
+
+.card img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-content h3 {
+    font-size: 24px;
+    margin-bottom: 5px;
+    color: #4d1e1e;
+}
+
+.author {
+    font-style: italic;
+    font-size: 16px;
+    color: #8b0000;
+}
+
+.genre {
+    font-size: 14px;
+    background: #ffebb3;
+    padding: 4px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    margin: 8px 0;
+}
+
+.synopsis {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+    flex-grow: 1;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-around;
+}
+
+.btn {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.like {
+    background: #d4f7d4;
+    color: #236d2f;
+}
+
+.dislike {
+    background: #f8d7da;
+    color: #b02a37;
+}
+
+.end-message {
+    font-size: 20px;
+    text-align: center;
+    color: #7c6a42;
+    background: #fff3c1;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}

@@ -1,0 +1,165 @@
+body {
+    background: url('/images/bgb.png') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Garamond', serif;
+    color: #120303;
+    margin: 0;
+    padding: 0;
+}
+
+.welcome-box {
+    text-align: center;
+    background: rgba(180, 13, 4, 0.9);
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 15px;
+}
+
+nav {
+    background: linear-gradient(to right, #b40d04, #ea3a1b);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav a {
+    color: #f5f1e9;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: 0.3s ease;
+}
+
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+
+nav a.logout {
+    background: #da2222;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+nav a.logout:hover {
+    background: #b40808;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+    background: rgb(229, 236, 82);
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.filters {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.filters input,
+.filters select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 16px;
+}
+
+h2 {
+    color: #4b3f2f;
+    text-align: center;
+}
+
+.book-card {
+    display: flex;
+    flex-direction: column;
+    background: #fffbe6;
+    margin: 20px 0;
+    padding: 15px;
+    border-left: 5px solid #4b3f2f;
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.book-header {
+    display: flex;
+    align-items: center;
+}
+
+.book-card img {
+    width: 100px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 20px;
+}
+
+.book-info {
+    flex: 1;
+}
+
+.book-info h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #2e251b;
+}
+
+.status {
+    font-style: italic;
+    font-size: 15px;
+    color: #666;
+}
+
+.progress-bar {
+    background-color: #ddd;
+    border-radius: 8px;
+    margin-top: 10px;
+    height: 16px;
+    overflow: hidden;
+}
+
+.progress {
+    background-color: #b40d04;
+    height: 100%;
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.rating {
+    margin-top: 10px;
+    font-size: 20px;
+    color: gold;
+    cursor: pointer;
+}
+
+.notes {
+    margin-top: 10px;
+}
+
+.notes textarea {
+    width: 100%;
+    padding: 10px;
+    font-family: inherit;
+    margin-top: 5px;
+    display: none;
+}
+
+.toggle-notes {
+    background: #ea3a1b;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
