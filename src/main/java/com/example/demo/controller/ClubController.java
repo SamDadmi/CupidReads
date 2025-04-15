@@ -5,7 +5,8 @@ import com.example.demo.model.ClubChat; // <-- Import new model
 import com.example.demo.model.User; // <-- Import User model
 import com.example.demo.service.ClubService;
 import com.example.demo.service.UserService; // <-- Import UserService
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -21,8 +22,8 @@ import java.util.List; // <-- Import List
 import java.util.stream.Collectors;
 
 @Controller
-@Slf4j // Enable logging
 public class ClubController {
+    private static final Logger log = LoggerFactory.getLogger(ClubController.class);
 
     @Autowired
     private ClubService clubService;
