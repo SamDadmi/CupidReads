@@ -1,6 +1,6 @@
 package com.example.demo.service;
 import com.example.demo.repository.BookRepo;
-
+import com.example.demo.service.IUserService;
 import com.example.demo.model.Book;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepo;
@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
-public class UserService {
+public class UserService implements IUserService {
     @Autowired
     private UserRepo userRepo;
 
