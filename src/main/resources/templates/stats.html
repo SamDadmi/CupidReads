@@ -4,6 +4,14 @@
     <title>CupidReads - Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
+        body {
+            background: url('/images/background.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Garamond', serif;
+            color: #120303;
+            margin: 0;
+            padding: 0;
+        }
         .card {
             border: none;
             border-radius: 15px;
@@ -40,30 +48,52 @@
             border-bottom: none;
         }
         nav {
-            background-color: #f8f9fa;
-            padding: 1rem;
+            background: linear-gradient(to right, #b40d04, #ea3a1b);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 2rem;
         }
         nav a {
-            margin-right: 1rem;
+            color: #f5f1e9;
             text-decoration: none;
-            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 15px;
+            transition: 0.3s ease;
         }
         nav a:hover {
-            color: #0d6efd;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+        nav button.logout {
+            background: #da2222;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            color: #ffffff;
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: bolder;
+            font-size: 18px;
+        }
+        nav button.logout:hover {
+            background: #b40808;
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav>
-        <a href="/">Home</a>
-        <a href="/swipe-books">Swipe Books</a>
-        <a href="/my-books">My Books</a>
-        <a href="/clubs">Clubs</a>
-        <a href="/users/profile">Profile</a>
-        <a href="/users/premium">Premium Details</a>
-        <a th:if="${#authentication.principal.username == 'admin'}" href="/stats">Statistics</a>
+        <div>
+            <a href="/">Home</a>
+            <a href="/swipe-books">Swipe Books</a>
+            <a href="/my-books">My Books</a>
+            <a href="/clubs">Clubs</a>
+            <a href="/users/profile">Profile</a>
+            <a href="/users/premium">Premium Details</a>
+            <a th:if="${#authentication.principal.username == 'admin'}" href="/stats">Statistics</a>
+        </div>
         <form th:action="@{/logout}" method="post" style="display: inline;">
             <button type="submit" class="logout">Logout</button>
         </form>
