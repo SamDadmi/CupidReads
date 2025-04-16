@@ -17,6 +17,7 @@ public class User {
     private String favoriteGenres;
     private String favoriteLanguages;
     private String bio;
+    private String profilePicture;
     @Version
     private Long version;
     private String role = "USER"; 
@@ -65,4 +66,7 @@ public class User {
 
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }
+
+    public String getProfilePicture() { return profilePicture; }
+    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
 }

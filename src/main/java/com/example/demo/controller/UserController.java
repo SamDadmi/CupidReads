@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.service.UserService;
+import com.example.demo.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
     @PostMapping("/{userId}/swipe-books/{bookId}")
     public String addBookToWishlist(@PathVariable String userId, @PathVariable String bookId, Model model) {
         boolean success = userService.addBookToWishlist(userId, bookId);
@@ -32,15 +36,30 @@ public class UserController {
             User user = userService.getUserByUsername(username);
 
             if (user != null) {
-                model.addAttribute("user", user);
+                model.addAttribute("userName", user.getUsername());
+                model.addAttribute("userEmail", user.getEmail());
+                model.addAttribute("userBio", user.getBio());
+                model.addAttribute("favoriteGenres", user.getFavoriteGenres());
+                model.addAttribute("favoriteLanguages", user.getFavoriteLanguages());
+                
+                // Handle profile picture path
+                String profilePicturePath;
+                if (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
+                    profilePicturePath = "/uploads/" + user.getProfilePicture();
+                    System.out.println("Profile picture path: " + profilePicturePath);
+                } else {
+                    profilePicturePath = "/images/default-profile.png";
+                }
+                model.addAttribute("profilePicture", profilePicturePath);
             } else {
                 redirectAttributes.addFlashAttribute("error", "User not found.");
                 return "redirect:/";
             }
 
-            return "profile"; // profile.html
+            return "profile";
         } catch (Exception e) {
-            // Optionally use log.error here if you're using logging
+            System.out.println("Error in viewProfile: " + e.getMessage());
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Something went wrong: " + e.getMessage());
             return "redirect:/";
         }
@@ -48,7 +67,7 @@ public class UserController {
 
     @PostMapping("/profile/update")
     public String updateProfile(
-            @RequestParam String username,
+            @RequestParam String name,
             @RequestParam String email,
             @RequestParam(required = false) String bio,
             @RequestParam(required = false) String favoriteGenres,
@@ -59,31 +78,55 @@ public class UserController {
         
         try {
             String currentUsername = auth.getName();
+            System.out.println("Updating profile for user: " + currentUsername);
+            
             User user = userService.getUserByUsername(currentUsername);
             
             if (user != null) {
+                System.out.println("Found user, updating profile...");
+                
                 // Update user details
-                user.setUsername(username);
+                user.setUsername(name);
                 user.setEmail(email);
+                user.setBio(bio);
                 user.setFavoriteGenres(favoriteGenres);
                 user.setFavoriteLanguages(favoriteLanguages);
                 
                 // Handle profile picture upload if provided
                 if (profilePicture != null && !profilePicture.isEmpty()) {
-                    // Here you would implement the logic to save the profile picture
-                    // For now, we'll just update the other fields
+                    System.out.println("Processing profile picture upload...");
+                    try {
+                        String fileName = fileStorageService.storeFile(profilePicture);
+                        user.setProfilePicture(fileName);
+                        System.out.println("Profile picture saved as: " + fileName);
+                    } catch (Exception e) {
+                        System.out.println("Error saving profile picture: " + e.getMessage());
+                        e.printStackTrace();
+                        redirectAttributes.addFlashAttribute("error", "Error saving profile picture: " + e.getMessage());
+                        return "redirect:/users/profile";
+                    }
                 }
                 
-                // Save the updated user
-                userService.updateUser(user);
-                
-                redirectAttributes.addFlashAttribute("success", "Profile updated successfully!");
+                try {
+                    // Save the updated user
+                    userService.updateUser(user);
+                    System.out.println("Profile updated successfully!");
+                    redirectAttributes.addFlashAttribute("success", "Profile updated successfully!");
+                } catch (Exception e) {
+                    System.out.println("Error saving user: " + e.getMessage());
+                    e.printStackTrace();
+                    redirectAttributes.addFlashAttribute("error", "Error saving profile: " + e.getMessage());
+                    return "redirect:/users/profile";
+                }
             } else {
+                System.out.println("User not found: " + currentUsername);
                 redirectAttributes.addFlashAttribute("error", "User not found.");
             }
             
             return "redirect:/users/profile";
         } catch (Exception e) {
+            System.out.println("Error updating profile: " + e.getMessage());
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Failed to update profile: " + e.getMessage());
             return "redirect:/users/profile";
         }
