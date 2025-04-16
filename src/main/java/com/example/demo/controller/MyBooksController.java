@@ -20,20 +20,22 @@ public class MyBooksController {
     private BookRepo bookRepo;
 
     @GetMapping("/my-books")
-    public String viewMyBooks(Authentication auth, Model model) {
-        try {
-            String username = auth.getName();
-            User user = userService.getUserByUsername(username);
-            
-            if (user != null) {
-                model.addAttribute("books", user.getWishlist());
-                return "my-books";
-            }
-            return "redirect:/login";
-        } catch (Exception e) {
-            return "redirect:/login";
+public String viewMyBooks(Authentication auth, Model model) {
+    try {
+        String username = auth.getName();
+        User user = userService.getUserByUsername(username);
+        
+        if (user != null) {
+            model.addAttribute("books", user.getWishlist());
+            model.addAttribute("isPremium", user.getIsPremium());  // ✅ Add this line!
+            return "my-books";
         }
+        return "redirect:/login";
+    } catch (Exception e) {
+        return "redirect:/login";
     }
+}
+
 
     @PostMapping("/my-books/update-status")
     public String updateBookStatus(
@@ -100,4 +102,24 @@ public class MyBooksController {
             return "redirect:/my-books";
         }
     }
+
+    @GetMapping("/my-books/view-pdf/{bookId}")
+public String viewBookPdf(@PathVariable String bookId, Authentication auth, Model model) {
+    User user = userService.getUserByUsername(auth.getName());
+
+    if (user == null || !user.getIsPremium()) {
+        return "redirect:/premium";
+    }
+
+    Book book = bookRepo.findById(bookId).orElse(null);
+    if (book == null) {
+        return "redirect:/my-books";
+    }
+
+    model.addAttribute("book", book);
+    model.addAttribute("pdfUrl", book.getPdfUrl());  // pdfUrl must be stored in the Book model
+
+    return "view-pdf";
+}
+
 } 

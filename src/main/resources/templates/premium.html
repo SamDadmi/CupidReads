@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Premium Membership - CupidReads</title>
+    <!-- <link rel="stylesheet" href="/css/style.css"> Or inline below -->
+    
+
+    <style>
+        body {
+            background: url('/images/bgb.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Garamond', serif;
+            color: #120303;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: linear-gradient(to right, #b40d04, #ea3a1b);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 99;
+        }
+
+        nav a {
+            color: #f5f1e9;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 80px;
+        }
+
+        .premium-card {
+            background: #fffef2;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .premium-card h2 {
+            font-size: 28px;
+            color: #4d1e1e;
+        }
+
+        .price {
+            font-size: 22px;
+            margin: 10px 0;
+            color: #b40d04;
+        }
+
+        .features {
+            margin: 20px 0;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            background: #b40d04;
+            color: white;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #8e0808;
+        }
+    </style>
+</head>
+<body>
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<!-- Navigation Bar -->
+<nav>
+    <a href="/">Home</a>
+    <a href="/wishlist">Swipe Books</a>
+    <a href="/my-books">My Books</a>
+    <a href="/clubs">Clubs</a>
+    <a href="/profile">Profile</a>
+</nav>
+
+<!-- Premium Plan Card -->
+<div class="container">
+    <div class="premium-card">
+        <!-- Inside premium-card -->
+<h2>🌟 Premium Membership</h2>
+<p class="price">₹199/month</p>
+<div class="features">
+    <p>✔️ Track reading progress</p>
+    <p>✔️ Access to full book PDFs</p>
+    <p>✔️ Exclusive clubs & features</p>
+</div>
+
+<!-- If user is already premium, show message instead of button -->
+<div th:if="${isPremium}">
+    <p style="color: green; font-weight: bold;">You are a premium member 🎉</p>
+</div>
+
+<!-- If user is NOT premium, show the upgrade button -->
+<!-- If user is NOT premium, show the upgrade button -->
+<form th:if="${!isPremium}" action="/users/upgrade" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+    <button type="submit" class="btn">Become Premium</button>
+</form>
+    <!-- <button type="submit" class="btn">Become Premium</button>
+</form> -->
+
+    </div>
+</div>
+
+</body>
+</html>

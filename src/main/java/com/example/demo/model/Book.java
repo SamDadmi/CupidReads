@@ -19,6 +19,7 @@ public class Book {
     private String notes = ""; // User's notes about the book
     @Version
     private Long version;
+    private String pdfUrl;  // URL or path to the PDF
 
 
     // Getters and Setters
@@ -51,4 +52,7 @@ public class Book {
 
     public Long getVersion() { return version; }
     public void setVersion(Long version) { this.version = version; }
+
+    public String getPdfUrl(){ return pdfUrl; }
+    public void setPdfUrl(String pdfUrl) { this.pdfUrl = pdfUrl; }
 }

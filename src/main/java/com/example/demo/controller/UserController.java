@@ -89,5 +89,42 @@ public class UserController {
         }
     }
 
+    @GetMapping("/premium")
+    public String premiumPage(Model model, Authentication auth) {
+        String username = auth.getName();
+        User user = userService.findByUsername(username);
+
+        System.out.println("Authenticated User ID: " + username);
+        System.out.println("isPremium " + user.getIsPremium());
+
+
+
+        if (user == null) {
+            model.addAttribute("error", "User not found!");
+            return "error"; // Ensure you have 'error.html' to handle this
+        }
+
+        System.out.println("User Premium Status: " + user.getIsPremium()); // Debug log
+        model.addAttribute("isPremium", user.getIsPremium());
+        return "premium";
+    }
+
+    @PostMapping("/upgrade")
+    public String upgradeUser(Authentication auth) {
+        String username = auth.getName(); // or however you identify users
+        User user = userService.findByUsername(username);
+
+        System.out.println("Authenticated User ID: " + username);
+
+        if (user == null) {
+            System.out.println("❌ User not found for upgrade!");
+            return "redirect:/error"; // Or return an error view if needed
+        }
+
+        System.out.println("isPremium " + user.getIsPremium());
+
+        userService.upgradeToPremium(username);
+        return "redirect:/users/premium"; // make sure this matches your GET mapping
+    }
 }
 

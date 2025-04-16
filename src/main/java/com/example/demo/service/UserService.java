@@ -37,6 +37,10 @@ public class UserService {
         return false;  // Return false if the user or book was not found
     }
 
+    public User findByUsername(String username) {
+    return userRepo.findByUsername(username).orElse(null);
+    }
+
     public boolean registerUser(String username, String email, String rawPassword) {
         if (userRepo.findByUsername(username).isPresent()) return false;
 
@@ -59,4 +63,23 @@ public class UserService {
     public void updateUser(User user) {
         userRepo.save(user);
     }
+
+    public void upgradeToPremium(String username) {
+    Optional<User> userOpt = userRepo.findByUsername(username); // now it's clear
+    if (userOpt.isPresent()) {
+        User user = userOpt.get();
+        user.setIsPremium(true);
+        userRepo.save(user);
+        System.out.println("✅ Upgraded user to premium: " + user.getUsername());
+    } else {
+        System.out.println("❌ Couldn't upgrade. User not found for username: " + username);
+    }
 }
+public boolean isUserPremium(String username) {
+    return userRepo.findByUsername(username)
+                   .map(user -> user.getIsPremium())
+                   .orElse(false);
+}
+
+}
+
