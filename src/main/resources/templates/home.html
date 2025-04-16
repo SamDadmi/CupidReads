@@ -13,18 +13,16 @@
 <meta name="_csrf" th:content="${_csrf.token}"/>
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <nav>
+    <a href="/">Home</a>
     <a href="/swipe-books">Swipe Books</a>
     <a href="/my-books">My Books</a>
     <a href="/clubs">Clubs</a>
     <a href="/users/profile">Profile</a>
     <a href="/users/premium">Premium Details</a>
-
-    <!-- <a href="/logout" style="float: right;">Logout</a> -->
+    <a th:if="${#authentication.principal.username == 'admin'}" href="/stats">Statistics</a>
     <form th:action="@{/logout}" method="post" style="display: inline;">
         <button type="submit" class="logout">Logout</button>
     </form>
-    
-     
 </nav>
 
 <div class="slideshow-container">
@@ -59,7 +57,7 @@
         "A reader lives a thousand lives before he dies. – George R.R. Martin",
         "I have always imagined that Paradise will be a kind of library. – Jorge Luis Borges",
         "Reading is essential for those who seek to rise above the ordinary. – Jim Rohn",
-        "That’s the thing about books. They let you travel without moving your feet. – Jhumpa Lahiri",
+        "That's the thing about books. They let you travel without moving your feet. – Jhumpa Lahiri",
         "Books are a uniquely portable magic. – Stephen King"
     ];
 

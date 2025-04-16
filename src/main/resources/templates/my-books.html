@@ -17,9 +17,14 @@
 <nav th:fragment="navbar">
     <a href="/">Home</a>
     <a href="/swipe-books">Swipe Books</a>
+    <a href="/my-books">My Books</a>
     <a href="/clubs">Clubs</a>
     <a href="/users/profile">Profile</a>
-    <!-- <a href="/logout" class="logout">Logout</a> -->
+    <a href="/users/premium">Premium Details</a>
+    <a th:if="${#authentication.principal.username == 'admin'}" href="/stats">Statistics</a>
+    <form th:action="@{/logout}" method="post" style="display: inline;">
+        <button type="submit" class="logout">Logout</button>
+    </form>
 </nav>
 
 
