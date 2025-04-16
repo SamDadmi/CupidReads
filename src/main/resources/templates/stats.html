@@ -162,9 +162,9 @@
             <a href="/users/premium">Premium Details</a>
             <a th:if="${#authentication.principal.username == 'admin'}" href="/stats">Statistics</a>
         </div>
-        <form th:action="@{/logout}" method="post" style="display: inline;">
+        <!-- <form th:action="@{/logout}" method="post" style="display: inline;">
             <button type="submit" class="logout">Logout</button>
-        </form>
+        </form> -->
     </nav>
     
     <div class="container mt-4">
