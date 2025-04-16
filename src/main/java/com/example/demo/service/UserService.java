@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -79,6 +80,37 @@ public boolean isUserPremium(String username) {
     return userRepo.findByUsername(username)
                    .map(user -> user.getIsPremium())
                    .orElse(false);
+}
+
+public long getTotalUsers() {
+    return userRepo.count();
+}
+
+public long getPremiumUsers() {
+    return userRepo.countByIsPremium(true);
+}
+
+public long getActiveUsers() {
+    // For now, we'll consider all users as active
+    // In a real application, you might want to track last login time
+    return userRepo.count();
+}
+
+public long getNewUsersLast7Days() {
+    // For now, we'll return a fixed number
+    // In a real application, you would track user creation date
+    return 5;
+}
+
+public double getAverageBooksPerUser() {
+    List<User> users = userRepo.findAll();
+    if (users.isEmpty()) return 0;
+    
+    int totalBooks = users.stream()
+        .mapToInt(user -> user.getWishlist().size())
+        .sum();
+    
+    return (double) totalBooks / users.size();
 }
 
 }

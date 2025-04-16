@@ -39,10 +39,35 @@
         .list-group-item:last-child {
             border-bottom: none;
         }
+        nav {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        nav a {
+            margin-right: 1rem;
+            text-decoration: none;
+            color: #333;
+        }
+        nav a:hover {
+            color: #0d6efd;
+        }
     </style>
 </head>
 <body>
-    <div th:replace="fragments/navbar :: navbar"></div>
+    <!-- Navigation -->
+    <nav>
+        <a href="/">Home</a>
+        <a href="/swipe-books">Swipe Books</a>
+        <a href="/my-books">My Books</a>
+        <a href="/clubs">Clubs</a>
+        <a href="/users/profile">Profile</a>
+        <a href="/users/premium">Premium Details</a>
+        <a th:if="${#authentication.principal.username == 'admin'}" href="/stats">Statistics</a>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <button type="submit" class="logout">Logout</button>
+        </form>
+    </nav>
     
     <div class="container mt-4">
         <div class="row">

@@ -8,4 +8,5 @@ public interface UserRepo extends Neo4jRepository<User, String> {
     Optional<User> findByUsername(String username);
     Optional<User> findById(String userId);
     boolean existsByUsername(String username);
+    long countByIsPremium(boolean isPremium);
 } 
