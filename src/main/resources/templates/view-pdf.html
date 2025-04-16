@@ -206,7 +206,8 @@
     </style>
 </head>
 <body>
-
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <div class="top-bar">
     <div class="book-title" th:text="${book.title}">Book Title</div>
     <a th:href="@{/my-books}" class="back-button">Back to My Books</a>
@@ -233,6 +234,8 @@
 
 <!-- Load PDF.js dynamically -->
 <script>
+     const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+     const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
     // Function to load JS script dynamically
     function loadScript(url, callback) {
         const script = document.createElement('script');
@@ -264,61 +267,214 @@
     function initPdfAnnotator() {
         // Get PDF URL from data attribute
         const pdfContainer = document.getElementById('pdf-container');
-        let pdfUrl = pdfContainer.getAttribute('data-pdf-url');
+    let pdfUrl = pdfContainer.getAttribute('data-pdf-url');
+    
+    // If URL is not available, use a fallback for development/testing
+    if (!pdfUrl) {
+        console.warn('No PDF URL provided, using sample PDF');
+        pdfUrl = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
+    } else {
+        console.log('Loading PDF from URL:', pdfUrl);
+    }
+
+    // Extract book ID from URL
+    const bookId = window.location.pathname.split('/').pop();
+    // Extract PDF filename from URL
+    const pdfName = pdfUrl.split('/').pop();
+
+    // Set up the PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
+
+    // Variables to store PDF document and current state
+    let pdfDoc = null;
+    let currentPage = 1;
+    let pageRendering = false;
+    let pageNumPending = null;
+    let scale = 1.5;
+    let canvas = null;
+    let ctx = null;
+    let currentTool = 'cursor';
+    let annotations = {};
+    
+    // Save annotations to server
+    function saveAnnotations() {
+        if (!annotations[currentPage]) return;
         
-        // If URL is not available, use a fallback for development/testing
-        if (!pdfUrl) {
-            console.warn('No PDF URL provided, using sample PDF');
-            pdfUrl = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
-        } else {
-            console.log('Loading PDF from URL:', pdfUrl);
+        // Get the annotation we want to save - the last one added
+        const newAnnotation = annotations[currentPage][annotations[currentPage].length - 1];
+
+        if (newAnnotation.path.some(item => !item || typeof item !== 'object' || !item.x || !item.y)) {
+            console.error("Invalid path items detected.");
+            return; // Exit early if the path is invalid
         }
 
-        // Set up the PDF.js worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
-
-        // Variables to store PDF document and current state
-        let pdfDoc = null;
-        let currentPage = 1;
-        let pageRendering = false;
-        let pageNumPending = null;
-        let scale = 1.5;
-        let canvas = null;
-        let ctx = null;
-        let currentTool = 'cursor';
-        let annotations = {};
         
-        // Save annotations to local storage to persist across page refreshes
-        function saveAnnotations() {
-            const bookId = window.location.pathname.split('/').pop(); // Get book ID from URL
-            localStorage.setItem(`annotations_${bookId}`, JSON.stringify(annotations));
+        console.log("newAnnotation:", newAnnotation);
+        if (newAnnotation.type === 'drawing') {
+            console.log("Drawing annotation path:", newAnnotation.path);
+            if (newAnnotation.path.some(item => !item || typeof item !== 'object' || !item.x || !item.y)) {
+                console.error("Invalid path items detected.");
+                return; // Exit early if the path is invalid
+            }
         }
-        
-        // Load annotations from local storage
-        function loadAnnotations() {
-            const bookId = window.location.pathname.split('/').pop(); // Get book ID from URL
+
+        // Prepare the data for the API
+        const annotationData = {
+            content: newAnnotation.type === 'text' ? newAnnotation.text : '',
+            pageNumber: currentPage,
+            xPosition: newAnnotation.x || (newAnnotation.path ? newAnnotation.path[0].x : 0),
+            yPosition: newAnnotation.y || (newAnnotation.path ? newAnnotation.path[0].y : 0),
+            annotationType: newAnnotation.type,
+            // For complex annotations like drawings, stringify the data
+            additionalData: JSON.stringify(newAnnotation)
+        };
+        console.log("Annotation data being sent:", annotationData);
+        console.log("Full annotation data:", JSON.stringify(annotationData, null, 2));
+
+
+        // Send to server
+        fetch(`/api/annotations/pdf/${pdfName}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content')
+            },
+            body: JSON.stringify(annotationData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to save annotation');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Annotation saved successfully:', data);
+            // Add the server ID to the annotation for future reference
+            newAnnotation.id = data.id;
+        })
+        .catch(error => {
+            console.error('Error saving annotation:', error);
+            alert('Failed to save annotation. Please try again.');
+        });
+    }
+    
+    // Load annotations from server
+    function loadAnnotations() {
+        fetch(`/api/annotations/pdf/${pdfName}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load annotations');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Loaded annotations:', data);
+            
+            // Process the data from the server
+            annotations = {};
+            
+            data.forEach(item => {
+                // Initialize the page array if it doesn't exist
+                if (!annotations[item.pageNumber]) {
+                    annotations[item.pageNumber] = [];
+                }
+                
+                // Parse the additionalData which contains the full annotation
+                try {
+                    const fullAnnotation = JSON.parse(item.additionalData);
+                    // Add server ID for reference
+                    fullAnnotation.id = item.id;
+                    annotations[item.pageNumber].push(fullAnnotation);
+                } catch (e) {
+                    console.error('Error parsing annotation data:', e);
+                    // Fallback for basic annotations
+                    const basicAnnotation = {
+                        id: item.id,
+                        type: item.annotationType,
+                        x: item.xPosition,
+                        y: item.yPosition,
+                        text: item.content
+                    };
+                    annotations[item.pageNumber].push(basicAnnotation);
+                }
+            });
+            
+            // If we're already viewing a page, refresh its annotations
+            if (currentPage && pdfDoc) {
+                renderPage(currentPage);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading annotations:', error);
+            // Fallback to local storage if available
             const savedAnnotations = localStorage.getItem(`annotations_${bookId}`);
             if (savedAnnotations) {
                 annotations = JSON.parse(savedAnnotations);
+                console.log('Loaded annotations from local storage as fallback');
+            }
+        });
+    }
+
+    // Delete an annotation
+    function deleteAnnotation(annotationId) {
+        fetch(`/api/annotations/${annotationId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content')
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete annotation');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Annotation deleted successfully');
+        })
+        .catch(error => {
+            console.error('Error deleting annotation:', error);
+        });
+    }
+    
+    // Modify clear annotations to use the API
+    document.getElementById('btn-clear').addEventListener('click', function() {
+        if (confirm('Are you sure you want to clear all annotations on this page?')) {
+            if (annotations[currentPage]) {
+                // Delete each annotation from the server
+                const annotationsToDelete = [...annotations[currentPage]];
+                annotationsToDelete.forEach(annotation => {
+                    if (annotation.id) {
+                        deleteAnnotation(annotation.id);
+                    }
+                });
+                
+                // Clear local cache
+                annotations[currentPage] = [];
+                
+                // Re-render to clear annotations visually
+                renderPage(currentPage);
             }
         }
-        
-        // Load any saved annotations
-        loadAnnotations();
+    });
+    
+    // Load annotations immediately
+    loadAnnotations();
 
-        // Load the PDF
-        pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
-            console.log('PDF document loaded');
-            pdfDoc = pdf;
-            document.getElementById('page-count').textContent = pdfDoc.numPages;
-            
-            // Initial page rendering
-            renderPage(currentPage);
-        }).catch(function(error) {
-            console.error('Error loading PDF:', error);
-            document.getElementById('pdf-viewer').innerHTML = 
-                `<div style="color: white; padding: 20px;">Failed to load PDF. Error: ${error.message}</div>`;
-        });
+    // Load the PDF
+    pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
+        console.log('PDF document loaded');
+        pdfDoc = pdf;
+        document.getElementById('page-count').textContent = pdfDoc.numPages;
+        
+        // Initial page rendering
+        renderPage(currentPage);
+    }).catch(function(error) {
+        console.error('Error loading PDF:', error);
+        document.getElementById('pdf-viewer').innerHTML = 
+            `<div style="color: white; padding: 20px;">Failed to load PDF. Error: ${error.message}</div>`;
+    });
+
 
         // Render the page
         function renderPage(pageNum) {
@@ -406,7 +562,58 @@
                 renderPage(num);
             }
         }
+        function displayAnnotation(annotation, layer) {
+            if (annotation.type === 'highlight') {
+                const highlight = document.createElement('div');
+                highlight.className = 'highlight';
+                highlight.style.left = annotation.x + 'px';
+                highlight.style.top = annotation.y + 'px';
+                highlight.style.width = annotation.width + 'px';
+                highlight.style.height = annotation.height + 'px';
+                layer.appendChild(highlight);
+            } 
+            else if (annotation.type === 'drawing') {
+                const svgNS = "http://www.w3.org/2000/svg";
+                const svg = document.createElementNS(svgNS, "svg");
+                svg.setAttribute('class', 'drawing-path');
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.width = '100%';
+                svg.style.height = '100%';
+                
+                const path = document.createElementNS(svgNS, "path");
+                path.setAttribute("stroke", "red");
+                path.setAttribute("stroke-width", "2");
+                path.setAttribute("fill", "none");
+                
+                let d = `M ${annotation.path[0].x} ${annotation.path[0].y}`;
+                for (let i = 1; i < annotation.path.length; i++) {
+                    d += ` L ${annotation.path[i].x} ${annotation.path[i].y}`;
+                }
+                
+                path.setAttribute("d", d);
+                svg.appendChild(path);
+                layer.appendChild(svg);
+            } 
+            else if (annotation.type === 'text') {
+                const text = document.createElement('div');
+                text.className = 'text-annotation';
+                text.style.left = annotation.x + 'px';
+                text.style.top = annotation.y + 'px';
+                text.textContent = annotation.text;
+                layer.appendChild(text);
+            }
+        }
 
+        // Display all annotations for a page
+        function displayAnnotations(pageNum, layer) {
+            if (annotations[pageNum]) {
+                annotations[pageNum].forEach(function(annotation) {
+                    displayAnnotation(annotation, layer);
+                });
+            }
+        }
         // Set up annotation events
         function setupAnnotationEvents(layer, viewport) {
             let isDrawing = false;
@@ -493,95 +700,72 @@
             });
             
             layer.addEventListener('mouseup', function(e) {
-                if (!isDrawing) return;
+            if (!isDrawing) return;
+            
+            const rect = layer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            if (currentTool === 'highlight') {
+                const highlight = {
+                    type: 'highlight',
+                    x: Math.min(startX, x),
+                    y: Math.min(startY, y),
+                    width: Math.abs(x - startX),
+                    height: Math.abs(y - startY)
+                };
                 
-                const rect = layer.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                if (currentTool === 'highlight') {
-                    const highlight = {
-                        type: 'highlight',
-                        x: Math.min(startX, x),
-                        y: Math.min(startY, y),
-                        width: Math.abs(x - startX),
-                        height: Math.abs(y - startY)
-                    };
-                    
-                    annotations[currentPage].push(highlight);
-                    displayAnnotation(highlight, layer);
-                    saveAnnotations();
-                } else if (currentTool === 'draw') {
-                    const existingPaths = layer.querySelectorAll('.temp-drawing-path');
-                    existingPaths.forEach(path => path.remove());
-                    
-                    const drawing = {
-                        type: 'drawing',
-                        path: drawingPath
-                    };
-                    
-                    annotations[currentPage].push(drawing);
-                    displayAnnotation(drawing, layer);
-                    saveAnnotations();
+                if (!annotations[currentPage]) {
+                    annotations[currentPage] = [];
                 }
                 
-                isDrawing = false;
-            });
+                annotations[currentPage].push(highlight);
+                displayAnnotation(highlight, layer);
+                saveAnnotations(); // This now sends to server
+            } else if (currentTool === 'draw') {
+                // ... existing drawing code ...
+                
+                const drawing = {
+                    type: 'drawing',
+                    path: drawingPath
+                };
+                
+                if (!annotations[currentPage]) {
+                    annotations[currentPage] = [];
+                }
+                
+                annotations[currentPage].push(drawing);
+                displayAnnotation(drawing, layer);
+                saveAnnotations(); // This now sends to server
+            }
+            
+            isDrawing = false;
+        });
+        
+        // Same for text annotations
+        if (currentTool === 'text') {
+            const text = prompt('Enter text:');
+            if (text) {
+                const textAnnotation = {
+                    type: 'text',
+                    x: x,
+                    y: y,
+                    text: text
+                };
+                
+                if (!annotations[currentPage]) {
+                    annotations[currentPage] = [];
+                }
+                
+                annotations[currentPage].push(textAnnotation);
+                displayAnnotation(textAnnotation, layer);
+                saveAnnotations(); // This now sends to server
+            }
         }
+        
 
         // Display an annotation
-        function displayAnnotation(annotation, layer) {
-            if (annotation.type === 'highlight') {
-                const highlight = document.createElement('div');
-                highlight.className = 'highlight';
-                highlight.style.left = annotation.x + 'px';
-                highlight.style.top = annotation.y + 'px';
-                highlight.style.width = annotation.width + 'px';
-                highlight.style.height = annotation.height + 'px';
-                layer.appendChild(highlight);
-            } 
-            else if (annotation.type === 'drawing') {
-                const svgNS = "http://www.w3.org/2000/svg";
-                const svg = document.createElementNS(svgNS, "svg");
-                svg.setAttribute('class', 'drawing-path');
-                svg.style.position = 'absolute';
-                svg.style.top = '0';
-                svg.style.left = '0';
-                svg.style.width = '100%';
-                svg.style.height = '100%';
-                
-                const path = document.createElementNS(svgNS, "path");
-                path.setAttribute("stroke", "red");
-                path.setAttribute("stroke-width", "2");
-                path.setAttribute("fill", "none");
-                
-                let d = `M ${annotation.path[0].x} ${annotation.path[0].y}`;
-                for (let i = 1; i < annotation.path.length; i++) {
-                    d += ` L ${annotation.path[i].x} ${annotation.path[i].y}`;
-                }
-                
-                path.setAttribute("d", d);
-                svg.appendChild(path);
-                layer.appendChild(svg);
-            } 
-            else if (annotation.type === 'text') {
-                const text = document.createElement('div');
-                text.className = 'text-annotation';
-                text.style.left = annotation.x + 'px';
-                text.style.top = annotation.y + 'px';
-                text.textContent = annotation.text;
-                layer.appendChild(text);
-            }
-        }
-
-        // Display all annotations for a page
-        function displayAnnotations(pageNum, layer) {
-            if (annotations[pageNum]) {
-                annotations[pageNum].forEach(function(annotation) {
-                    displayAnnotation(annotation, layer);
-                });
-            }
-        }
+        
 
         // Clear annotations
         document.getElementById('btn-clear').addEventListener('click', function() {
@@ -654,6 +838,7 @@
                 setActiveTool('text');
             }
         });
+    }
     }
 </script>
 

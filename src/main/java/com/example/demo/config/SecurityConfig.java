@@ -24,7 +24,7 @@ public class SecurityConfig {
                 // .csrf(csrf -> csrf.disable())  // Disable CSRF protection for now
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login","/logout", "/register", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/swipe-books", "/wishlist/**", "/swipe-books/**", "/wishlist", "/book_pdfs").authenticated()  // Explicitly allow authenticated access to wishlist
+                        .requestMatchers("/swipe-books", "/wishlist/**", "/swipe-books/**", "/wishlist", "/book_pdfs", "/profile/update").authenticated()  // Explicitly allow authenticated access to wishlist
                         .anyRequest().authenticated()
                 )
                 // .formLogin(Customizer.withDefaults()) // Use default Spring Boot login page
