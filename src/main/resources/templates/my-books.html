@@ -3,7 +3,6 @@
 <head>
     <title>My Books - CupidReads</title>
     <link rel="stylesheet" th:href="@{/css/my-books.css}">
-
 </head>
 <body>
 
@@ -13,7 +12,7 @@
 
 <meta name="_csrf" th:content="${_csrf.token}"/>
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-<!-- navbar.html -->
+
 <nav th:fragment="navbar">
     <a href="/">Home</a>
     <a href="/swipe-books">Swipe Books</a>
@@ -22,216 +21,63 @@
     <a href="/users/profile">Profile</a>
     <a href="/users/premium">Premium Details</a>
     <a th:if="${#authentication.principal.username == 'admin'}" href="/stats">Statistics</a>
-    <!-- <form th:action="@{/logout}" method="post" style="display: inline;">
-        <button type="submit" class="logout">Logout</button>
-    </form> -->
 </nav>
-
 
 <div class="container">
     <h2>Your Book Collection</h2>
 
+    <!-- Filter/Search Bar -->
     <div class="filters">
         <input type="text" id="searchBox" placeholder="Search by title or author">
-        <select id="filterStatus">
-            <option value="">All Status</option>
-            <option value="Completed">Completed</option>
-            <option value="Currently Reading">Currently Reading</option>
-            <option value="Wishlist">Wishlist</option>
-        </select>
     </div>
 
-    <!-- Book Template -->
-    <!-- <div class="book-card" data-title="The Great Gatsby" data-author="F. Scott Fitzgerald" data-status="Completed">
-        <div class="book-header">
-            <img src="/images/gatsby.jpg" alt="The Great Gatsby">
-            <div class="book-info">
-                <h3>The Great Gatsby</h3>
-                <p>by F. Scott Fitzgerald</p>
-                <p class="status">Status: Completed</p>
-                <div class="progress-bar"><div class="progress" style="width: 100%;">100%</div></div>
-                <div class="rating" data-stars="4">★★★★☆</div>
+    <!-- Book List -->
+    <div class="books-container">
+        <div th:each="book : ${books}" class="book-card"
+             th:attr="data-title=${book.title.toLowerCase()}, 
+                      data-author=${book.author.toLowerCase()}">
 
-                <div class="book-details">
-                    <p class="synopsis"><strong>Synopsis:</strong> A classic novel that explores themes of wealth, love, and the American Dream.</p>
-                    <p class="reviews"><strong>Reviews:</strong> "A timeless masterpiece" – NY Times</p>
-                    <p class="discussions"><strong>Discussions:</strong> Explores symbolism in 1920s America and character-driven narratives.</p>
-                </div>
+            <div class="book-header">
+                <img th:src="@{${book.image}}" th:alt="${book.title}" />
 
-                <button class="toggle-notes">Add/View Notes</button>
-                <div class="notes"><textarea rows="3">A masterpiece of symbolism.</textarea></div>
-            </div>
-        </div>
-    </div>
-    <div class="book-card" data-title="To Kill a Mockingbird" data-author="Harper Lee" data-status="Wishlist">
-        <div class="book-header">
-            <img src="/images/mockingbird.png" alt="To Kill a Mockingbird">
-            <div class="book-info">
-                <h3>To Kill a Mockingbird</h3>
-                <p>by Harper Lee</p>
-                <p class="status">Status: Wishlist</p>
-                <div class="progress-bar"><div class="progress" style="width: 0%;">0%</div></div>
-                <div class="rating" data-stars="0">☆☆☆☆☆</div>
+                <div class="book-info">
+                    <h3 th:text="${book.title}">Title</h3>
+                    <p th:text="'by ' + ${book.author}">Author</p>
 
-                <div class="book-details">
-                    <p class="synopsis"><strong>Synopsis:</strong> Set in the racially charged American South, this novel follows young Scout Finch as her father defends a black man unjustly accused of a crime.</p>
-                    <p class="reviews"><strong>Reviews:</strong> "A powerful reflection on justice and morality" – Chicago Tribune</p>
-                    <p class="discussions"><strong>Discussions:</strong> Topics include racial injustice, moral growth, and the loss of innocence.</p>
-                </div>
-                
-                <button class="toggle-notes">Add/View Notes</button>
-                <div class="notes"><textarea rows="3"></textarea></div>
-            </div>
-        </div>
-    </div>
-</div> -->
-
-<!-- <div class="wishlist-section">
-    <h2>Your Wishlist</h2>
-
-    <div th:if="${#lists.isEmpty(books)}">
-        <p>No books in your wishlist yet. Go swipe some!</p>
-    </div>
-
-    <div th:each="book : ${books}" class="book-card" 
-         th:attr="data-title=${book.title}, data-author=${book.author}, data-status=${book.status}">
-        
-        <div class="book-header">
-            <img th:src="@{${book.coverImage}}" th:alt="${book.title}" />
-            <div class="book-info">
-                <h3 th:text="${book.title}">Book Title</h3>
-                <p th:text="'by ' + ${book.author}">Author</p>
-                <p class="status" th:text="'Status: ' + ${book.status}">Status</p>
-
-                <div class="progress-bar">
-                    <div class="progress" th:style="'width: ' + ${book.progress} + '%'">
-                        <span th:text="${book.progress + '%'}">Progress</span>
+                    <div th:if="${isPremium}">
+                        <a th:href="@{/my-books/view-pdf/{bookId}(bookId=${book.book_id})}">📖 View PDF</a>
+                    </div>
+                    <div th:unless="${isPremium}">
+                        <em>Upgrade to Premium to view this book</em>
                     </div>
                 </div>
-
-                <div class="rating" th:attr="data-stars=${book.rating}">
-                    <span th:utext="${'★'.repeat(book.rating) + '☆'.repeat(5 - book.rating)}">Rating</span>
-                </div>
-
-                <div class="book-details">
-                    <p class="synopsis"><strong>Synopsis:</strong> <span th:text="${book.synopsis}">Synopsis here</span></p>
-                    <p class="reviews"><strong>Reviews:</strong> <span th:text="${book.reviews}">Review here</span></p>
-                    <p class="discussions"><strong>Discussions:</strong> <span th:text="${book.discussions}">Discussion here</span></p>
-                </div>
-
-                <button class="toggle-notes">Add/View Notes</button>
-                <div class="notes">
-                    <textarea rows="3" th:text="${book.notes}">User notes here</textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
-
-<div class="books-container">
-    <div th:each="book : ${books}" class="book-card">
-        <div class="book-header">
-            <img th:src="@{${book.image}}" th:alt="${book.title}" />
-
-            <div class="book-info">
-                <h3 th:text="${book.title}"></h3>
-                <p th:text="'by ' + ${book.author}"></p>
-                <div th:if="${isPremium}">
-                    <a th:href="@{/my-books/view-pdf/{bookId}(bookId=${book.book_id})}">📖 View PDF</a>
-                  </div>
-                  <div th:unless="${isPremium}">
-                    <em>Upgrade to Premium to view this book</em>
-                </div>
-
-                
-                <p class="status">Status: <span th:text="${book.status}">Unknown</span></p>
-
-                <form method="post" action="/my-books/update-status">
-                    <input type="hidden" name="bookId" th:value="${book.book_id}" />
-                    <select name="status" onchange="this.form.submit()">
-                        <option th:selected="${book.status == 'Wishlist'}">Wishlist</option>
-                        <option th:selected="${book.status == 'In Progress'}">In Progress</option>
-                        <option th:selected="${book.status == 'Completed'}">Completed</option>
-                    </select>
-                </form>
-
-                <!-- <div class="progress-bar">
-                    <div class="progress" th:style="'width:' + ${book.progress} + '%'">
-                        <span th:text="${book.progress + '%'}">0%</span>
-                    </div>
-                </div> -->
-
-                <form method="post" action="/my-books/update-rating">
-                    <input type="hidden" name="bookId" th:value="${book.book_id}" />
-                    <select name="rating" onchange="this.form.submit()">
-                        <option th:each="i : ${#numbers.sequence(0,5)}"
-                                th:value="${i}"
-                                th:selected="${i == book.rating}"
-                                th:text="${i}">0</option>
-                    </select>
-                </form>
-
-                <form method="post" action="/my-books/update-notes">
-                    <input type="hidden" name="bookId" th:value="${book.book_id}" />
-                    <textarea name="notes" rows="3" onchange="this.form.submit()"
-                              th:text="${book.notes}">Enter notes...</textarea>
-                </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Show Reading Progress for Premium Users -->
-<!-- <div th:if="${user.isPremium"}>
-    <form th:action="@{'/books/' + ${book.book_id} + '/progress'}" method="post">
-        <label for="currentPage">Progress (Current Page):</label>
-        <input type="number" name="currentPage" min="0"
-               th:value="${book.progress?.currentPage}" onchange="this.form.submit()" />
-    </form>
-</div> -->
-
-
+<!-- JavaScript Filtering Logic -->
 <script>
-    // Filter and Search
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
     const searchBox = document.getElementById('searchBox');
-    const filterStatus = document.getElementById('filterStatus');
     const cards = document.querySelectorAll('.book-card');
 
     function filterBooks() {
         const searchText = searchBox.value.toLowerCase();
-        const status = filterStatus.value;
 
         cards.forEach(card => {
-            const title = card.getAttribute('data-title').toLowerCase();
-            const author = card.getAttribute('data-author').toLowerCase();
-            const cardStatus = card.getAttribute('data-status');
+            const title = card.getAttribute('data-title') || "";
+            const author = card.getAttribute('data-author') || "";
 
             const matchesSearch = title.includes(searchText) || author.includes(searchText);
-            const matchesStatus = !status || status === cardStatus;
 
-            card.style.display = (matchesSearch && matchesStatus) ? 'block' : 'none';
+            card.style.display = matchesSearch ? 'block' : 'none';
         });
     }
 
     searchBox.addEventListener('input', filterBooks);
-    filterStatus.addEventListener('change', filterBooks);
-
-    // Toggle Notes
-    document.querySelectorAll('.toggle-notes').forEach(button => {
-        button.addEventListener('click', () => {
-            const notes = button.nextElementSibling.querySelector('textarea');
-            notes.style.display = notes.style.display === 'block' ? 'none' : 'block';
-        });
-    });
-
-    // Optional: Dynamic Star Rating (for future if needed)
-    document.querySelectorAll('.rating').forEach(rating => {
-        rating.addEventListener('click', () => {
-            let stars = parseInt(prompt("Rate this book (0-5):"), 10);
-            stars = Math.max(0, Math.min(5, stars));
-            rating.textContent = "★★★★★☆☆☆☆☆".slice(5 - stars, 10 - stars);
-        });
-    });
 </script>
 
 </body>
