@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="${club.name} + ' - Chat'">Club Chat</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <style>
         body {
             background: url('/images/bookbg.png') no-repeat center center fixed;
@@ -238,23 +240,29 @@
         <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
         <!-- Chat Messages -->
-        <div class="chat-messages">
+        <div id="chat-messages" class="chat-messages">
             <div th:each="chat : ${chats}" 
-                 th:class="${chat.user.username == currentUser.username ? 'message sent' : 'message received'}">
-                <div class="message-header" th:text="${chat.user.username}">Username</div>
-                <div class="message-content" th:text="${chat.message}">Message content</div>
-                <div class="message-time" th:text="${#temporals.format(chat.timestamp, 'MMM dd, yyyy HH:mm')}">
-                    Time
+                 th:class="${chat.user != null and chat.user.username == currentUser.username ? 'message sent' : 'message received'}">
+                <div class="message-header">
+                    <span class="username" th:if="${chat.user != null}" th:text="${chat.user.username}">Username</span>
+                    <span class="timestamp" th:text="${#temporals.format(chat.timestamp, 'HH:mm')}">Time</span>
                 </div>
+                <div class="message-content" th:text="${chat.message}">Message content</div>
             </div>
         </div>
 
         <!-- Chat Input Form -->
-        <form th:action="@{/club/{name}/chats(name=${club.name})}" method="post" class="chat-input">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            <input type="text" name="message" placeholder="Type your message..." required>
+        <form id="messageForm" class="chat-input">
+            <input type="hidden" id="clubName" th:value="${club.name}">
+            <input type="text" id="message" placeholder="Type your message..." required>
             <button type="submit">Send</button>
         </form>
     </div>
+
+    <script th:inline="javascript">
+        // Get current user info from Thymeleaf
+        const currentUsername = /*[[${currentUser.username}]]*/ '';
+    </script>
+    <script src="/js/club-chat.js"></script>
 </body>
 </html> 
