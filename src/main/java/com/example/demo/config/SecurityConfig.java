@@ -21,36 +21,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // .csrf(csrf -> csrf.disable())  // Disable CSRF protection for now
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login","/logout", "/register", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/swipe-books", "/wishlist/**", "/swipe-books/**", "/wishlist", "/book_pdfs", "/profile/update").authenticated()  // Explicitly allow authenticated access to wishlist
-                        .anyRequest().authenticated()
-                )
-                // .formLogin(Customizer.withDefaults()) // Use default Spring Boot login page
-                // .logout(Customizer.withDefaults());
-
-                .formLogin(form -> form
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/chat/**", "/ws/**")) // Allow chat endpoints without CSRF
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/login", "/logout", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/api/chat/**", "/ws/**").authenticated() // Explicitly allow authenticated access to chat endpoints
+                .requestMatchers("/swipe-books", "/wishlist/**", "/swipe-books/**", "/wishlist", "/book_pdfs", "/profile/update").authenticated()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true)
                 .permitAll()
             )
-        //     .logout(logout -> logout
-        //         .logoutSuccessUrl("/login?logout")
-        //         .permitAll()
-        //     );
-
-        .logout(logout -> logout
-                .logoutUrl("/logout")  // URL to trigger logout (you can customize this)
-                .logoutSuccessUrl("/login?logout")  // Redirect to the login page with a "logout" query param after logout
-                .invalidateHttpSession(true)  // Invalidate the session to clear session data
-                .clearAuthentication(true)  // Clear authentication information
-                .permitAll()  // Allow everyone to access the logout URL
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .permitAll()
             )
-
-         .headers(headers -> headers
-            .frameOptions().sameOrigin()  // 👈 THIS FIXES YOUR IFRAME ISSUE
-        );
+            .headers(headers -> headers
+                .frameOptions().sameOrigin()
+            );
 
         return http.build();
     }

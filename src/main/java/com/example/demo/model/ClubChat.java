@@ -1,11 +1,11 @@
 package com.example.demo.model;
 
 import java.time.LocalDateTime;
-
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Node("ClubChat")
 public class ClubChat {
@@ -16,24 +16,22 @@ public class ClubChat {
     private String message;
     private LocalDateTime timestamp;
 
-    // Relationship: User --[SENT_BY]--> ClubChat
-    // Direction is OUTGOING because the arrow points *from* User *to* ClubChat
+    @JsonIgnoreProperties({"clubs", "password", "roles", "authorities", "accountNonExpired", "accountNonLocked", "credentialsNonExpired", "enabled"})
     @Relationship(type = "SENT_BY", direction = Relationship.Direction.OUTGOING)
     private User user;
 
-    // Relationship: ClubChat --[BELONGS_TO]--> Club
-    // Direction is OUTGOING because the arrow points *from* ClubChat *to* Club
+    @JsonIgnoreProperties({"members", "invitedEmails", "createdBy"})
     @Relationship(type = "BELONGS_TO", direction = Relationship.Direction.OUTGOING)
     private Club club;
 
     // Default constructor
     public ClubChat() {
-        this.timestamp = LocalDateTime.now(); // Set timestamp on creation
+        this.timestamp = LocalDateTime.now();
     }
 
     // Constructor for creating a new chat message
     public ClubChat(String message, User user, Club club) {
-        this(); // Calls the default constructor to set the timestamp
+        this();
         this.message = message;
         this.user = user;
         this.club = club;
@@ -79,5 +77,16 @@ public class ClubChat {
 
     public void setClub(Club club) {
         this.club = club;
+    }
+
+    @Override
+    public String toString() {
+        return "ClubChat{" +
+            "id=" + id +
+            ", message='" + message + '\'' +
+            ", timestamp=" + timestamp +
+            ", user=" + (user != null ? user.getUsername() : "null") +
+            ", club=" + (club != null ? club.getName() : "null") +
+            '}';
     }
 }

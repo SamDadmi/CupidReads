@@ -200,4 +200,27 @@ public class ClubService {
         log.info("Successfully saved chat message with ID: {}", savedChat.getId());
         return savedChat;
     }
+
+    public List<ClubChat> getClubChatsAfter(String clubName, Long timestamp) {
+        try {
+            log.debug("Fetching chats for club {} after timestamp {}", clubName, timestamp);
+            
+            LocalDateTime after;
+            if (timestamp == 0) {
+                // If timestamp is 0, get messages from the last 24 hours
+                after = LocalDateTime.now().minusHours(24);
+            } else {
+                // Convert milliseconds timestamp to LocalDateTime
+                after = LocalDateTime.ofInstant(
+                    java.time.Instant.ofEpochMilli(timestamp),
+                    java.time.ZoneId.systemDefault()
+                );
+            }
+                
+            return clubChatRepo.findByClubAndTimestampAfterOrderByTimestampAsc(clubName, after);
+        } catch (Exception e) {
+            log.error("Error fetching chats after timestamp for club {}: {}", clubName, e.getMessage(), e);
+            throw e;
+        }
+    }
 }
