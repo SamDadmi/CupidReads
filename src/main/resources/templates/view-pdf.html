@@ -298,25 +298,36 @@
     
     // Save annotations to server
     function saveAnnotations() {
-        if (!annotations[currentPage]) return;
+        if (!annotations[currentPage] || annotations[currentPage].length === 0) {console.log("null annotations"); return;};
         
         // Get the annotation we want to save - the last one added
         const newAnnotation = annotations[currentPage][annotations[currentPage].length - 1];
 
-        if (newAnnotation.path.some(item => !item || typeof item !== 'object' || !item.x || !item.y)) {
-            console.error("Invalid path items detected.");
-            return; // Exit early if the path is invalid
-        }
+        // if (newAnnotation.path.some(item => item==null || typeof item !== 'object' || item.x==null || item.y==null)) {
+        //     console.error("Invalid path items detected.");
+        //     return; // Exit early if the path is invalid
+        // }
+        
 
         
         console.log("newAnnotation:", newAnnotation);
         if (newAnnotation.type === 'drawing') {
             console.log("Drawing annotation path:", newAnnotation.path);
-            if (newAnnotation.path.some(item => !item || typeof item !== 'object' || !item.x || !item.y)) {
+            if (newAnnotation.path.some(item => !item || typeof item !== 'object' || item.x==null || item.y == null)) {
                 console.error("Invalid path items detected.");
                 return; // Exit early if the path is invalid
             }
         }
+
+    //     console.log("Highlight ann")
+
+    //     if (newAnnotation.type === 'highlight') {
+    //     // Check if the highlight annotation is valid
+    //     if (newAnnotation.x == null || newAnnotation.y == null || newAnnotation.width == null || newAnnotation.height == null) {
+    //         console.error("Invalid highlight annotation data:", newAnnotation);
+    //         return;
+    //     }
+    // }
 
         // Prepare the data for the API
         const annotationData = {
@@ -824,7 +835,7 @@
             if (e.code === 'ArrowLeft') {
                 document.getElementById('prev-page').click();
             } else if (e.code === 'ArrowRight') {
-                document.getElementById('next-page').click();
+                document.getElementByIdF('next-page').click();
             }
             
             // Tool selection with number keys
