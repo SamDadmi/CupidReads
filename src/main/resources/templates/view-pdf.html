@@ -303,10 +303,10 @@
         // Get the annotation we want to save - the last one added
         const newAnnotation = annotations[currentPage][annotations[currentPage].length - 1];
 
-        if (newAnnotation.path.some(item => !item || typeof item !== 'object' || !item.x || !item.y)) {
-            console.error("Invalid path items detected.");
-            return; // Exit early if the path is invalid
-        }
+        // if (newAnnotation.path.some(item => !item || typeof item !== 'object' || !item.x || !item.y)) {
+        //     console.error("Invalid path items detected.");
+        //     return; // Exit early if the path is invalid
+        // }
 
         
         console.log("newAnnotation:", newAnnotation);
