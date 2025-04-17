@@ -9,13 +9,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Configure uploads directory with absolute path
-        String uploadPath = "C:/Users/vashi/Downloads/gitrepocupid/CupidReads/src/main/resources/uploads/";
-        
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadPath)
-                .setCachePeriod(0);
-
         // Keep default static resource handling
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/");

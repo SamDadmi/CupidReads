@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.service.UserService;
-import com.example.demo.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +19,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private FileStorageService fileStorageService;
 
     @PostMapping("/{userId}/swipe-books/{bookId}")
     public String addBookToWishlist(@PathVariable String userId, @PathVariable String bookId, Model model) {
