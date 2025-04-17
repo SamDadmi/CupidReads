@@ -176,15 +176,14 @@
             <p class="club-title" th:text="${club.name}">Fantasy Lovers</p>
             <p class="club-desc" th:text="${club.description}">A club for fans of fantasy novels.</p>
             <p class="club-type" th:text="'Type: ' + ${club.clubType}">Type: Public</p>
-            <!-- Debug info -->
-            <div style="display: none;" th:text="${club.name}"></div>
-            <a th:href="@{/club/{name}/chats(name=${club.name})}" class="btn">View Club</a>
+            <a th:href="@{/club/{clubName}/chats(clubName=${club.name})}" class="btn">View Club</a>
         </div>
 
         <h2>Discover Book Clubs</h2>
         <div th:each="joinedClub : ${myBookClubs}" class="club-card">
             <p class="club-title" th:text="${joinedClub.name}">Sci-Fi Enthusiasts</p>
             <p class="club-desc" th:text="${joinedClub.description}">Discuss futuristic books and science fiction.</p>
+            <a th:href="@{/club/{clubName}/chats(clubName=${joinedClub.name})}" class="btn">View Club</a>
         </div>
 
         <button class="btn" onclick="toggleCreateClub()">➕ Create a Club</button>
