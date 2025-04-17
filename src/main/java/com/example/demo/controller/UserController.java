@@ -9,8 +9,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
 import com.example.demo.model.User;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import java.io.IOException;
 
 @Controller
 @RequestMapping("/users")
@@ -29,6 +31,17 @@ public class UserController {
         return "wishlist"; // this must match your wishlist.html template
     }
 
+    @GetMapping("/profile/picture/{userId}")
+    public ResponseEntity<byte[]> getProfilePicture(@PathVariable String userId) {
+        User user = userService.getUserById(userId);
+        if (user != null && user.getProfilePictureData() != null) {
+            return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(user.getProfilePictureContentType()))
+                .body(user.getProfilePictureData());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     @GetMapping("/profile")
     public String viewProfile(Authentication auth, Model model, RedirectAttributes redirectAttributes) {
         try {
@@ -42,15 +55,12 @@ public class UserController {
                 model.addAttribute("favoriteGenres", user.getFavoriteGenres());
                 model.addAttribute("favoriteLanguages", user.getFavoriteLanguages());
                 
-                // Handle profile picture path
-                String profilePicturePath;
-                if (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
-                    profilePicturePath = "/uploads/" + user.getProfilePicture();
-                    System.out.println("Profile picture path: " + profilePicturePath);
+                // Set profile picture URL
+                if (user.getProfilePictureData() != null) {
+                    model.addAttribute("profilePicture", "/users/profile/picture/" + user.getUser_id());
                 } else {
-                    profilePicturePath = "/images/default-profile.png";
+                    model.addAttribute("profilePicture", "/images/default-profile.png");
                 }
-                model.addAttribute("profilePicture", profilePicturePath);
             } else {
                 redirectAttributes.addFlashAttribute("error", "User not found.");
                 return "redirect:/";
@@ -58,8 +68,6 @@ public class UserController {
 
             return "profile";
         } catch (Exception e) {
-            System.out.println("Error in viewProfile: " + e.getMessage());
-            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Something went wrong: " + e.getMessage());
             return "redirect:/";
         }
@@ -78,55 +86,34 @@ public class UserController {
         
         try {
             String currentUsername = auth.getName();
-            System.out.println("Updating profile for user: " + currentUsername);
-            
             User user = userService.getUserByUsername(currentUsername);
             
             if (user != null) {
-                System.out.println("Found user, updating profile...");
-                
-                // Update user details
                 user.setUsername(name);
                 user.setEmail(email);
                 user.setBio(bio);
                 user.setFavoriteGenres(favoriteGenres);
                 user.setFavoriteLanguages(favoriteLanguages);
                 
-                // Handle profile picture upload if provided
+                // Handle profile picture upload
                 if (profilePicture != null && !profilePicture.isEmpty()) {
-                    System.out.println("Processing profile picture upload...");
                     try {
-                        String fileName = fileStorageService.storeFile(profilePicture);
-                        user.setProfilePicture(fileName);
-                        System.out.println("Profile picture saved as: " + fileName);
-                    } catch (Exception e) {
-                        System.out.println("Error saving profile picture: " + e.getMessage());
-                        e.printStackTrace();
-                        redirectAttributes.addFlashAttribute("error", "Error saving profile picture: " + e.getMessage());
+                        user.setProfilePictureData(profilePicture.getBytes());
+                        user.setProfilePictureContentType(profilePicture.getContentType());
+                    } catch (IOException e) {
+                        redirectAttributes.addFlashAttribute("error", "Error processing profile picture: " + e.getMessage());
                         return "redirect:/users/profile";
                     }
                 }
                 
-                try {
-                    // Save the updated user
-                    userService.updateUser(user);
-                    System.out.println("Profile updated successfully!");
-                    redirectAttributes.addFlashAttribute("success", "Profile updated successfully!");
-                } catch (Exception e) {
-                    System.out.println("Error saving user: " + e.getMessage());
-                    e.printStackTrace();
-                    redirectAttributes.addFlashAttribute("error", "Error saving profile: " + e.getMessage());
-                    return "redirect:/users/profile";
-                }
+                userService.updateUser(user);
+                redirectAttributes.addFlashAttribute("success", "Profile updated successfully!");
             } else {
-                System.out.println("User not found: " + currentUsername);
                 redirectAttributes.addFlashAttribute("error", "User not found.");
             }
             
             return "redirect:/users/profile";
         } catch (Exception e) {
-            System.out.println("Error updating profile: " + e.getMessage());
-            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Failed to update profile: " + e.getMessage());
             return "redirect:/users/profile";
         }

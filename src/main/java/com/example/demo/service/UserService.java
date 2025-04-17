@@ -113,5 +113,9 @@ public double getAverageBooksPerUser() {
     return (double) totalBooks / users.size();
 }
 
+public User getUserById(String userId) {
+    return userRepo.findById(userId).orElse(null);
+}
+
 }
 
