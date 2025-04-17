@@ -1,5 +1,8 @@
 package com.example.demo.config;
 
+import com.example.demo.service.LoggingUserServiceDecorator;
+import com.example.demo.service.UserService;
+import com.example.demo.service.IUserService;
 import com.example.demo.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -48,6 +51,11 @@ public class SecurityConfig {
         return http.build();
     }
 //Adding things
+
+@Bean
+    public IUserService loggingUserService(UserService userService) {
+        return new LoggingUserServiceDecorator(userService);
+    }
  @Bean
     public AuthenticationManager authenticationManager(
         AuthenticationConfiguration config) throws Exception {
