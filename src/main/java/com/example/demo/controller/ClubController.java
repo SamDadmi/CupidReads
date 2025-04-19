@@ -33,25 +33,34 @@ public class ClubController {
 
     // --- Existing Endpoints (/clubs, /clubs/create, /clubs/join) ---
     @GetMapping("/clubs")
-    public String viewClubs(Model model, Authentication auth) { // Pass Authentication
+    public String viewClubs(Model model, Authentication auth) {
         try {
-             // Get current user's clubs (Optional: Adjust based on your logic)
+            // Get current user's clubs
             String username = auth.getName();
             User currentUser = userService.getUserByUsername(username);
+            
             if (currentUser != null) {
+                // Get clubs the user is a member of
                 model.addAttribute("myBookClubs", currentUser.getClubs());
+                
+                // Get all clubs except those the user is already a member of
+                List<Club> allClubs = clubService.getAllClubs();
+                List<Club> discoverableClubs = allClubs.stream()
+                    .filter(club -> !currentUser.getClubs().contains(club))
+                    .collect(Collectors.toList());
+                model.addAttribute("clubs", discoverableClubs);
             } else {
-                 model.addAttribute("myBookClubs", Collections.emptySet()); // Handle user not found if necessary
+                model.addAttribute("myBookClubs", Collections.emptyList());
+                model.addAttribute("clubs", Collections.emptyList());
+                model.addAttribute("error", "User not found");
             }
-
-            // Get all clubs for discovery (you might want to filter out joined clubs later)
-            model.addAttribute("clubs", clubService.getAllClubs());
+            
             return "clubs";
         } catch (Exception e) {
-             log.error("Error viewing clubs page: {}", e.getMessage(), e);
-             model.addAttribute("error", "Could not load clubs.");
-             return "clubs"; // Or redirect to an error page
-         }
+            log.error("Error viewing clubs page: {}", e.getMessage(), e);
+            model.addAttribute("error", "Could not load clubs.");
+            return "clubs";
+        }
     }
 
 
