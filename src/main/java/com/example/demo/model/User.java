@@ -17,7 +17,11 @@ public class User {
     private String favoriteGenres;
     private String favoriteLanguages;
     private String bio;
-    private String profilePicture;
+    
+    // Updated profile picture fields
+    private byte[] profilePictureData;
+    private String profilePictureContentType;
+    
     @Version
     private Long version;
     private String role = "USER"; 
@@ -67,6 +71,19 @@ public class User {
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }
 
-    public String getProfilePicture() { return profilePicture; }
-    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
+    public byte[] getProfilePictureData() {
+        return profilePictureData;
+    }
+
+    public void setProfilePictureData(byte[] profilePictureData) {
+        this.profilePictureData = profilePictureData;
+    }
+
+    public String getProfilePictureContentType() {
+        return profilePictureContentType;
+    }
+
+    public void setProfilePictureContentType(String profilePictureContentType) {
+        this.profilePictureContentType = profilePictureContentType;
+    }
 }

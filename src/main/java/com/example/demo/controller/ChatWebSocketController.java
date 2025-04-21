@@ -25,6 +25,7 @@ public class ChatWebSocketController {
     public static class ChatMessage {
         private String message;
         private String username;
+        private String type;
 
         public String getMessage() {
             return message;
@@ -40,6 +41,14 @@ public class ChatWebSocketController {
 
         public void setUsername(String username) {
             this.username = username;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
     }
 

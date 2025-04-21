@@ -9,6 +9,8 @@ import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -16,8 +18,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic"); // Enables a simple memory-based message broker
-        config.setApplicationDestinationPrefixes("/app"); // Prefix for messages bound for methods annotated with @MessageMapping
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.setPoolSize(1);
+        taskScheduler.setThreadNamePrefix("wss-heartbeat-thread-");
+        taskScheduler.initialize();
+
+        config.enableSimpleBroker("/topic", "/queue", "/user");
+        config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefix("/user");
     }
 
     @Override
@@ -27,7 +35,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS()
                 .setWebSocketEnabled(true)
                 .setHeartbeatTime(25000)
-                .setDisconnectDelay(5000);
+                .setDisconnectDelay(5000)
+                .setStreamBytesLimit(2 * 1024 * 1024) // 2MB
+                .setHttpMessageCacheSize(1000);
+    }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.setMessageSizeLimit(2 * 1024 * 1024) // 2MB
+                   .setSendBufferSizeLimit(2 * 1024 * 1024) // 2MB
+                   .setSendTimeLimit(20000); // 20 seconds
     }
 
     @Override
@@ -39,6 +56,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 return message;
             }
         });
+        registration.taskExecutor().corePoolSize(2).maxPoolSize(4);
     }
 
     @Override
@@ -50,5 +68,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 return message;
             }
         });
+        registration.taskExecutor().corePoolSize(2).maxPoolSize(4);
     }
 } 
