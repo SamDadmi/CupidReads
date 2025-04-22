@@ -1,4 +1,5 @@
-![Uploading Screenshot (1585).png…]()
+![Screenshot (1585)](https://github.com/user-attachments/assets/3e331bd3-38f0-416f-9360-23b6bfea83c8)
+
 
 # 📚 CupidReads
 
