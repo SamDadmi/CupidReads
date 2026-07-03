@@ -7,6 +7,8 @@
 
 CupidReads is an interactive platform that reimagines the reading experience by combining smart book recommendations, social book clubs, and premium reading features—all in one intuitive interface.
 
+Developed collaboratively by (in no particular order):
+@sanyavashist, @SammithaRT, @SamDadmi, and @SanjanaHB
 ---
 
 ## 🧩 Problem Statement
